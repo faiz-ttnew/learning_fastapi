@@ -1,0 +1,65 @@
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python bytecode / caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# Packaging / build
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Testing / coverage
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Databases (local dev)
+*.db
+*.sqlite
+*.sqlite3
+
+# Alembic / migrations cache (keep the versions folder itself)
+# alembic.ini  # uncomment if it contains secrets
+
+# Logs
+*.log
+logs/
+
+# Uploads / local storage
+uploads/
+media/
+
+# IDEs / editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Docker (local overrides)
+docker-compose.override.yml

@@ -1,0 +1,6 @@
+# API framework
+fastapi==0.143.0
+# Request and response models
+pydantic==2.14.1
+# ASGI server
+uvicorn==0.54.0
