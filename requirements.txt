@@ -9,3 +9,4 @@ pydantic[email]==2.14.1
 sqlalchemy>=2.0,<2.1
 pymysql[rsa]
 python-dotenv
+sqlparse
