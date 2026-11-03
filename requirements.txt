@@ -6,3 +6,6 @@ pydantic==2.14.1
 uvicorn==0.54.0
 # Request and response models (with email validation)
 pydantic[email]==2.14.1
+sqlalchemy>=2.0,<2.1
+pymysql[rsa]
+python-dotenv
