@@ -4,3 +4,5 @@ fastapi==0.143.0
 pydantic==2.14.1
 # ASGI server
 uvicorn==0.54.0
+# Request and response models (with email validation)
+pydantic[email]==2.14.1
