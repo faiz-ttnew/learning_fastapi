@@ -4,6 +4,7 @@ from app.routers import products
 from app.routers import employees
 from app.routers import employees_pydantic
 from fastapi.responses import JSONResponse
+from app.routers import employees_mysql
 
 app = FastAPI(
     title="User Management API",
@@ -33,3 +34,4 @@ app.include_router(users.router)
 app.include_router(products.router)
 app.include_router(employees.router)
 app.include_router(employees_pydantic.router)
+app.include_router(employees_mysql.router)
