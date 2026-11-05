@@ -5,23 +5,56 @@ from app.routers import employees
 from app.routers import employees_pydantic
 from fastapi.responses import JSONResponse
 from app.routers import employees_mysql
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 app = FastAPI(
     title="User Management API",
     version="1.0.0"
 )
 
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request: Request, exc: HTTPException):
+# Expected HTTP errors: 404, 403, etc.
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(
+    request: Request,
+    exc: StarletteHTTPException
+):
     return JSONResponse(
         status_code=exc.status_code,
         content={
-            'success': False,
-            'data': {
-                'message': exc.detail
+            "success": False,
+            "data": {
+                "message": exc.detail
             }
         },
         headers=exc.headers
+    )
+
+
+# Invalid request body, path or query parameters.
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: Request,
+    exc: RequestValidationError
+):
+    errors = []
+
+    for error in exc.errors():
+        errors.append({
+            "field": ".".join(str(part) for part in error["loc"]),
+            "message": error["msg"],
+            "type": error["type"]
+        })
+
+    return JSONResponse(
+        status_code=422,
+        content={
+            "success": False,
+            "data": {
+                "message": "Request validation failed",
+                "errors": errors
+            }
+        }
     )
 
 @app.get("/")
