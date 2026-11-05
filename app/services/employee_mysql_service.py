@@ -13,7 +13,7 @@ from app.schemas.employee_pydantic_schema import (
 EMPLOYEE_SELECT = """
     SELECT
         id, name, email, age, department, salary,
-        city, pincode, skills, joining_date
+        city, pincode, skills, joining_date, mobile_number
     FROM employees
 """
 
@@ -35,7 +35,8 @@ def row_to_employee(row) -> EmployeeResponse:
             "pincode": row["pincode"]
         },
         skills=skills,
-        joining_date=row["joining_date"]
+        joining_date=row["joining_date"],
+        mobile_number=row['mobile_number']
     )
 
 def create_employee(emp: EmployeeCreate):
@@ -50,7 +51,8 @@ def create_employee(emp: EmployeeCreate):
             city,
             pincode,
             skills,
-            joining_date
+            joining_date,
+            mobile_number
         )
         VALUES (
             :name, 
@@ -61,7 +63,8 @@ def create_employee(emp: EmployeeCreate):
             :city,
             :pincode,
             :skills,
-            :joining_date
+            :joining_date,
+            :mobile_number
         )
         """
     )
@@ -75,7 +78,8 @@ def create_employee(emp: EmployeeCreate):
         "city": emp.address.city,
         "pincode": emp.address.pincode,
         "skills": json.dumps(emp.skills),
-        "joining_date": emp.joining_date
+        "joining_date": emp.joining_date,
+        "mobile_number": emp.mobile_number
     }
 
     try:
@@ -85,13 +89,7 @@ def create_employee(emp: EmployeeCreate):
             emp_id = result.lastrowid
 
             row = connection.execute(
-                text("""
-                    SELECT
-                        id, name, email, age, department, salary,
-                        city, pincode, skills, joining_date
-                    FROM employees
-                    WHERE id = :emp_id
-                """),
+                text(EMPLOYEE_SELECT + " WHERE id = :emp_id"),
                 {"emp_id": emp_id}
             ).mappings().one()
 
@@ -165,12 +163,13 @@ def replace_employee(
         "name": emp.name,
         "email": str(emp.email),
         "age": emp.age,
-            "department": emp.department,
-            "salary": emp.salary,
-            "city": emp.address.city,
-            "pincode": emp.address.pincode,
-            "skills": json.dumps(emp.skills),
-            "joining_date": emp.joining_date
+        "department": emp.department,
+        "salary": emp.salary,
+        "city": emp.address.city,
+        "pincode": emp.address.pincode,
+        "skills": json.dumps(emp.skills),
+        "joining_date": emp.joining_date,
+        "mobile_number": emp.mobile_number
     }
     params['id'] = id
     query = """
@@ -185,6 +184,7 @@ def replace_employee(
                     pincode = :pincode,
                     skills = :skills,
                     joining_date = :joining_date
+                    mobile_number = :mobile_number
                 where id = :id
                 """
     with engine.begin() as conn:
@@ -216,7 +216,8 @@ def update_employee(id: int, emp: EmployeeUpdate):
         'age',
         "department",
         "salary",
-        "joining_date"
+        "joining_date",
+        "mobile_number"
     }
     params = {}
 

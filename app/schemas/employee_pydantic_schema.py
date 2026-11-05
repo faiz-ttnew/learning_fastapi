@@ -22,6 +22,10 @@ class EmployeeBase(BaseModel):
     address: Address
     skills: list[str] = Field(default_factory=list)
     joining_date: date
+    mobile_number: str | None = Field(
+        default=None,
+        pattern=r"^\+?[0-9]{10,15}$"
+    )
 
     @field_validator('name')
     @classmethod
@@ -66,6 +70,10 @@ class EmployeeUpdate(BaseModel):
     address: Address | None = None
     skills: list[str] | None = None
     joining_date : date | None = None
+    mobile_number: str | None = Field(
+    default=None,
+    pattern=r"^\+?[0-9]{10,15}$"
+)
 
 # Schema for API responses
 class EmployeeResponse(EmployeeBase):
