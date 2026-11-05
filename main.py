@@ -7,11 +7,14 @@ from fastapi.responses import JSONResponse
 from app.routers import employees_mysql
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from app.middleware.request_logging import log_requests
 
 app = FastAPI(
     title="User Management API",
     version="1.0.0"
 )
+
+app.middleware("http")(log_requests)
 
 # Expected HTTP errors: 404, 403, etc.
 @app.exception_handler(StarletteHTTPException)
