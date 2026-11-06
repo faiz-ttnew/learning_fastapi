@@ -9,6 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.middleware.request_logging import log_requests
 from app.routers import auth
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="User Management API",
@@ -16,6 +17,30 @@ app = FastAPI(
 )
 
 app.middleware("http")(log_requests)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000"
+    ],
+    allow_credentials=False,
+    allow_methods=[
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+    ],
+    allow_headers=[
+        "Authorization",
+        "Content-Type"
+    ],
+    expose_headers=[
+        "X-Process-Time"
+    ]
+)
 
 # Expected HTTP errors: 404, 403, etc.
 @app.exception_handler(StarletteHTTPException)
