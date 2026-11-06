@@ -5,6 +5,7 @@ from app.schemas.auth_schema import UserRegister, UserResponse, UserLogin, Token
 from app.services import auth_service
 from app.core.security import create_access_token
 from app.dependencies.auth import get_current_user
+from app.dependencies.auth import get_current_user, require_admin
 
 router = APIRouter(
     prefix="/auth",
@@ -49,7 +50,8 @@ def login(credentials: UserLogin):
 
 @router.get(
     '/users',
-    response_model=APIResponse[list[UserResponse]]
+    response_model=APIResponse[list[UserResponse]],
+    dependencies=[Depends(get_current_user)]
 )
 def get_users(
     skip: int = Query(default=0, ge=0),

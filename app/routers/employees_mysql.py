@@ -6,6 +6,8 @@ from app.schemas.employee_pydantic_schema import (
 )
 from app.services import employee_mysql_service
 from app.schemas.api_response import APIResponse, ResponseData
+from fastapi import APIRouter, Depends, Query, status
+from app.dependencies.auth import get_current_user, require_admin
 
 router = APIRouter(
     prefix='/employees-mysql',
@@ -29,7 +31,11 @@ def create_employee(emp: EmployeeCreate):
         )
     )
 
-@router.get("/", response_model=APIResponse[list[EmployeeResponse]])
+@router.get(
+    "/", 
+    response_model=APIResponse[list[EmployeeResponse]],
+    dependencies=[Depends(get_current_user)]
+)
 def get_employees(
         department: str | None = None,
         skip: int = Query(default = 0, ge = 0),
@@ -53,7 +59,8 @@ def get_employees(
 # /employees/1
 @router.get(
     "/{id}",
-    response_model=APIResponse[EmployeeResponse]
+    response_model=APIResponse[EmployeeResponse],
+    dependencies=[Depends(get_current_user)]
 )
 def get_employee_by_id(id: int):
     employee = employee_mysql_service.get_employee_by_id(id)
