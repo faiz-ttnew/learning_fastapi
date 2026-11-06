@@ -135,3 +135,28 @@ def get_users(
         users = [UserResponse.model_validate(dict(row)) for row in rows]
 
         return users
+def get_auth_user_by_id(user_id: int) -> UserResponse:
+    query = SELECT_USER;
+    query += " where id = :user_id"
+    params = {"user_id": user_id}
+
+    with engine.connect() as conn:
+        row = conn.execute(
+            text(
+                query
+            ),
+            params
+        ).mappings().one_or_none()
+
+        if row is None:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid authentication credentials",
+                headers={"WWW-Authenticate": "Bearer"}
+            )
+        if not row["is_active"]:
+            raise HTTPException(
+                status_code=403,
+                detail="Account is inactive"
+            )
+        return UserResponse.model_validate(dict(row))
