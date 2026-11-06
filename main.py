@@ -8,6 +8,7 @@ from app.routers import employees_mysql
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.middleware.request_logging import log_requests
+from app.routers import auth
 
 app = FastAPI(
     title="User Management API",
@@ -71,3 +72,4 @@ app.include_router(products.router)
 app.include_router(employees.router)
 app.include_router(employees_pydantic.router)
 app.include_router(employees_mysql.router)
+app.include_router(auth.router)

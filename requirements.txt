@@ -11,3 +11,4 @@ pymysql[rsa]
 python-dotenv
 sqlparse
 alembic
+pwdlib[argon2]

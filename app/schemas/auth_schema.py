@@ -1,4 +1,6 @@
 from typing import Literal
+from app.common.enums import UserRole
+from app.common.user_interface import UserInsertParams
 
 from pydantic import (
     BaseModel,
@@ -24,9 +26,9 @@ class UserRegister(BaseModel):
 
         return value
 
-    class UserResponse(BaseModel):
-        id: int
-        name: str
-        email: EmailStr
-        role: Literal["user", "admin"]
-        is_active: bool
+class UserResponse(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+    role: UserRole
+    is_active: bool

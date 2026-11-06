@@ -24,7 +24,7 @@ def upgrade():
             id INT NOT NULL AUTO_INCREMENT,
             name VARCHAR(100) NOT NULL,
             email VARCHAR(255) NOT NULL,
-            password_hash VARCHAR(1024) NOT NULL,
+            password VARCHAR(1024) NOT NULL,
             role ENUM('user', 'admin') NOT NULL DEFAULT 'user',
             is_active BOOLEAN NOT NULL DEFAULT TRUE,
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
