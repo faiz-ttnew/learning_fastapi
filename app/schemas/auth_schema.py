@@ -32,3 +32,9 @@ class UserResponse(BaseModel):
     email: EmailStr
     role: UserRole
     is_active: bool
+
+class UserLogin(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    email: EmailStr
+    password:SecretStr = Field(max_length=128)
