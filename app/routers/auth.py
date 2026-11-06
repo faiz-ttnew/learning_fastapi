@@ -1,8 +1,9 @@
 from fastapi import APIRouter, status, Query
 
 from app.schemas.api_response import APIResponse, ResponseData
-from app.schemas.auth_schema import UserRegister, UserResponse, UserLogin
+from app.schemas.auth_schema import UserRegister, UserResponse, UserLogin, TokenResponse
 from app.services import auth_service
+from app.core.security import create_access_token
 
 router = APIRouter(
     prefix="/auth",
@@ -27,16 +28,21 @@ def register(user: UserRegister):
 
 @router.post(
     '/login',
-    response_model=APIResponse[UserResponse]
+    response_model=APIResponse[TokenResponse]
 )
 def login(credentials: UserLogin):
     user = auth_service.login_user(credentials)
 
-    return APIResponse[UserResponse](
+    access_token = create_access_token(user.id)
+
+    return APIResponse[TokenResponse](
         success=True,
-        data = ResponseData[UserResponse](
-            message='Credentials verified successfully',
-            data=user
+        data=ResponseData[TokenResponse](
+            message="Login successful",
+            data=TokenResponse(
+                access_token=access_token,
+                token_type="bearer"
+            )
         )
     )
 

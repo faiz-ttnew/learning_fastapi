@@ -12,3 +12,4 @@ python-dotenv
 sqlparse
 alembic
 pwdlib[argon2]
+PyJWT

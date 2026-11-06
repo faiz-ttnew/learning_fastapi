@@ -1,4 +1,3 @@
-
 # FastAPI Employee Management API
 
 ## Project Setup
@@ -43,7 +42,7 @@ The database name must match `app/db/schema.sql`. The MySQL user needs permissio
 python -m app.db.init_db
 ```
 
-### 6. Check the database connection
+6. Check the database connection
 
 ```bash
 python check_db.py
@@ -61,3 +60,9 @@ uvicorn main:app --reload
 - Swagger UI: http://127.0.0.1:8000/docs
 
 Press `Ctrl+C` to stop the server.
+
+### 9. JWT setup
+- run command in terminal
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
