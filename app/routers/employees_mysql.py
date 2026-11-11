@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, Query, status, BackgroundTasks
 from app.schemas.employee_pydantic_schema import (
     EmployeeCreate,
     EmployeeUpdate,
@@ -8,6 +8,7 @@ from app.services import employee_mysql_service
 from app.schemas.api_response import APIResponse, ResponseData
 from fastapi import APIRouter, Depends, Query, status
 from app.dependencies.auth import get_current_user, require_admin
+from app.services.notification_service import notify_employee_created
 
 router = APIRouter(
     prefix='/employees-mysql',
@@ -19,9 +20,18 @@ router = APIRouter(
         "",
         response_model=APIResponse[EmployeeResponse],
         status_code=status.HTTP_201_CREATED,
+        dependencies=[Depends(require_admin)]
 )
-def create_employee(emp: EmployeeCreate):
+def create_employee(
+    emp: EmployeeCreate,
+    background_task: BackgroundTasks
+):
     emp = employee_mysql_service.create_employee(emp)
+
+    background_task.add_task(
+        notify_employee_created,
+        emp.id
+    )
 
     return APIResponse[EmployeeResponse](
         success=True,

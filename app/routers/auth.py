@@ -51,7 +51,7 @@ def login(credentials: UserLogin):
 @router.get(
     '/users',
     response_model=APIResponse[list[UserResponse]],
-    dependencies=[Depends(get_current_user)]
+    dependencies=[Depends(require_admin)]
 )
 def get_users(
     skip: int = Query(default=0, ge=0),

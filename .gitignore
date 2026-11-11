@@ -25,7 +25,7 @@ dist/
 .eggs/
 pip-wheel-metadata/
 empl.zip
-
+app.zip
 # Testing / coverage
 .coverage
 .coverage.*

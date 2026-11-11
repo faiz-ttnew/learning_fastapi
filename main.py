@@ -10,6 +10,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.middleware.request_logging import log_requests
 from app.routers import auth
 from fastapi.middleware.cors import CORSMiddleware
+from app.routers import async_demo
+from app.routers import tickets
 
 app = FastAPI(
     title="User Management API",
@@ -98,3 +100,5 @@ app.include_router(employees.router)
 app.include_router(employees_pydantic.router)
 app.include_router(employees_mysql.router)
 app.include_router(auth.router)
+app.include_router(async_demo.router)
+app.include_router(tickets.router)
