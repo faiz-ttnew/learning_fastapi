@@ -13,3 +13,4 @@ sqlparse
 alembic
 pwdlib[argon2]
 PyJWT
+redis

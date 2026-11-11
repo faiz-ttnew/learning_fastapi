@@ -6,6 +6,11 @@ from app.core.security import hash_password, verify_password
 from app.db.database import engine
 from app.schemas.auth_schema import UserRegister, UserResponse, UserLogin
 from app.common.enums import UserRole
+from pydantic import ValidationError
+from redis.exceptions import RedisError
+
+from app.core.config import AUTH_CACHE_KEY_PREFIX, AUTH_CACHE_TTL_SECONDS
+from app.core.redis_client import redis_client
 
 SELECT_USER = """select id, name, email, role, is_active from users"""
 
@@ -135,28 +140,51 @@ def get_users(
         users = [UserResponse.model_validate(dict(row)) for row in rows]
 
         return users
-def get_auth_user_by_id(user_id: int) -> UserResponse:
-    query = SELECT_USER;
-    query += " where id = :user_id"
-    params = {"user_id": user_id}
 
-    with engine.connect() as conn:
-        row = conn.execute(
-            text(
-                query
-            ),
-            params
-        ).mappings().one_or_none()
+def get_auth_user_by_id(user_id: int) -> UserResponse:
+    cache_key = f"{AUTH_CACHE_KEY_PREFIX}:user:{user_id}"
+    user = None
+
+    if redis_client is not None:
+        try:
+            cached = redis_client.get(cache_key)
+            if cached is not None:
+                candidate = UserResponse.model_validate_json(cached)
+                if candidate.id == user_id:
+                    user = candidate
+        except (RedisError, ValidationError):
+            # Redis unavailable ya cached JSON invalid hai.
+            # Neeche MySQL lookup chalega.
+            pass
+
+    if user is None:
+        with engine.connect() as conn:
+            row = conn.execute(
+                text(SELECT_USER + " WHERE id = :user_id"),
+                {"user_id": user_id},
+            ).mappings().one_or_none()
 
         if row is None:
             raise HTTPException(
                 status_code=401,
                 detail="Invalid authentication credentials",
-                headers={"WWW-Authenticate": "Bearer"}
+                headers={"WWW-Authenticate": "Bearer"},
             )
-        if not row["is_active"]:
-            raise HTTPException(
-                status_code=403,
-                detail="Account is inactive"
-            )
-        return UserResponse.model_validate(dict(row))
+
+        user = UserResponse.model_validate(dict(row))
+
+        if redis_client is not None and user.is_active:
+            try:
+                redis_client.set(
+                    cache_key,
+                    user.model_dump_json(),
+                    ex=AUTH_CACHE_TTL_SECONDS,
+                )
+            except RedisError:
+                # MySQL se user mil chuka hai. Request continue karegi.
+                pass
+
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Account is inactive")
+
+    return user
